@@ -1,16 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Crm.Domain.Common
+namespace Crm.Domain.Common;
+
+public abstract class BaseEntity
 {
-    public abstract class BaseEntity
-    {
-        [Column("id")]
-        public Guid Id { get; set; }
+    [Column("id")]
+    public Guid Id { get; set; }
 
-        [Column("created_at_utc")]
-        public DateTime CreatedAtUtc { get; set; }
+    [Column("created_at_utc")]
+    public DateTime CreatedAtUtc { get; set; }
 
-        [Column("updated_at_utc")]
-        public DateTime? UpdatedAtUtc { get; set; }
-    }
+    [Column("updated_at_utc")]
+    public DateTime? UpdatedAtUtc { get; set; }
 }

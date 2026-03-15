@@ -1,11 +1,10 @@
-﻿namespace Crm.Domain.Enums
+﻿namespace Crm.Domain.Enums;
+
+public enum ActivityType
 {
-    public enum ActivityType
-    {
-        Call = 1,
-        Email = 2,
-        Meeting = 3,
-        Message = 4,
-        Other = 5,
-    }
+    Call = 1,
+    Email = 2,
+    Meeting = 3,
+    Message = 4,
+    Other = 5,
 }

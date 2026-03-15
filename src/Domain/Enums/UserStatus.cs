@@ -1,8 +1,7 @@
-﻿namespace Crm.Domain.Enums
+﻿namespace Crm.Domain.Enums;
+
+public enum UserStatus
 {
-    public enum UserStatus
-    {
-        Active = 1,
-        Inactive = 2,
-    }
+    Active = 1,
+    Inactive = 2,
 }

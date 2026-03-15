@@ -9,632 +9,631 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Crm.Migrations
+namespace Crm.Migrations;
+
+[DbContext(typeof(CrmDbContext))]
+[Migration("20260311190524_Init")]
+partial class Init
 {
-    [DbContext(typeof(CrmDbContext))]
-    [Migration("20260311190524_Init")]
-    partial class Init
+    /// <inheritdoc />
+    protected override void BuildTargetModel(ModelBuilder modelBuilder)
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
-        {
 #pragma warning disable 612, 618
-            modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.4")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+        modelBuilder
+            .HasAnnotation("ProductVersion", "10.0.4")
+            .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+        NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Crm.Domain.Entities.Activity", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+        modelBuilder.Entity("Crm.Domain.Entities.Activity", b =>
+            {
+                b.Property<Guid>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uuid");
 
-                    b.Property<DateTime>("ActivityDateUtc")
-                        .HasColumnType("timestamp with time zone");
+                b.Property<DateTime>("ActivityDateUtc")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("ClientId")
-                        .HasColumnType("uuid");
+                b.Property<Guid>("ClientId")
+                    .HasColumnType("uuid");
 
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("timestamp with time zone");
+                b.Property<DateTime>("CreatedAtUtc")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid?>("DealId")
-                        .HasColumnType("uuid");
+                b.Property<Guid?>("DealId")
+                    .HasColumnType("uuid");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
+                b.Property<string>("Description")
+                    .HasColumnType("text");
 
-                    b.Property<string>("Subject")
-                        .HasColumnType("text");
+                b.Property<string>("Subject")
+                    .HasColumnType("text");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("text");
+                b.Property<string>("Type")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<DateTime?>("UpdatedAtUtc")
-                        .HasColumnType("timestamp with time zone");
+                b.Property<DateTime?>("UpdatedAtUtc")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uuid");
+                b.Property<Guid?>("UserId")
+                    .HasColumnType("uuid");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("ClientId");
+                b.HasIndex("ClientId");
 
-                    b.HasIndex("DealId");
+                b.HasIndex("DealId");
 
-                    b.HasIndex("UserId");
+                b.HasIndex("UserId");
 
-                    b.ToTable("activities", (string)null);
-                });
+                b.ToTable("activities", (string)null);
+            });
 
-            modelBuilder.Entity("Crm.Domain.Entities.Client", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+        modelBuilder.Entity("Crm.Domain.Entities.Client", b =>
+            {
+                b.Property<Guid>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uuid");
 
-                    b.Property<int>("Age")
-                        .HasColumnType("integer");
+                b.Property<int>("Age")
+                    .HasColumnType("integer");
 
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("timestamp with time zone");
+                b.Property<DateTime>("CreatedAtUtc")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("ExternalId")
-                        .IsRequired()
-                        .HasColumnType("text");
+                b.Property<string>("ExternalId")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<string>("FrequencyOfPurchases")
-                        .IsRequired()
-                        .HasColumnType("text");
+                b.Property<string>("FrequencyOfPurchases")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<string>("Gender")
-                        .IsRequired()
-                        .HasColumnType("text");
+                b.Property<string>("Gender")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<string>("Location")
-                        .IsRequired()
-                        .HasColumnType("text");
+                b.Property<string>("Location")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
+                b.Property<string>("Name")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<int>("PreviousPurchases")
-                        .HasColumnType("integer");
+                b.Property<int>("PreviousPurchases")
+                    .HasColumnType("integer");
 
-                    b.Property<DateTime?>("UpdatedAtUtc")
-                        .HasColumnType("timestamp with time zone");
+                b.Property<DateTime?>("UpdatedAtUtc")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("ExternalId")
-                        .IsUnique();
+                b.HasIndex("ExternalId")
+                    .IsUnique();
 
-                    b.ToTable("clients", (string)null);
-                });
+                b.ToTable("clients", (string)null);
+            });
 
-            modelBuilder.Entity("Crm.Domain.Entities.Deal", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+        modelBuilder.Entity("Crm.Domain.Entities.Deal", b =>
+            {
+                b.Property<Guid>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uuid");
 
-                    b.Property<Guid>("ClientId")
-                        .HasColumnType("uuid");
+                b.Property<Guid>("ClientId")
+                    .HasColumnType("uuid");
 
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("timestamp with time zone");
+                b.Property<DateTime>("CreatedAtUtc")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<bool>("DiscountApplied")
-                        .HasColumnType("boolean");
+                b.Property<bool>("DiscountApplied")
+                    .HasColumnType("boolean");
 
-                    b.Property<string>("PaymentMethod")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                b.Property<string>("PaymentMethod")
+                    .IsRequired()
+                    .HasMaxLength(100)
+                    .HasColumnType("character varying(100)");
 
-                    b.Property<bool>("PromoCodeUsed")
-                        .HasColumnType("boolean");
+                b.Property<bool>("PromoCodeUsed")
+                    .HasColumnType("boolean");
 
-                    b.Property<decimal>("PurchaseAmount")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("numeric(18,2)");
+                b.Property<decimal>("PurchaseAmount")
+                    .HasPrecision(18, 2)
+                    .HasColumnType("numeric(18,2)");
 
-                    b.Property<DateTime>("PurchaseDateUtc")
-                        .HasColumnType("timestamp with time zone");
+                b.Property<DateTime>("PurchaseDateUtc")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<decimal>("ReviewRating")
-                        .HasPrecision(3, 2)
-                        .HasColumnType("numeric(3,2)");
+                b.Property<decimal>("ReviewRating")
+                    .HasPrecision(3, 2)
+                    .HasColumnType("numeric(3,2)");
 
-                    b.Property<string>("Season")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                b.Property<string>("Season")
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .HasColumnType("character varying(50)");
 
-                    b.Property<string>("ShippingType")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                b.Property<string>("ShippingType")
+                    .HasMaxLength(100)
+                    .HasColumnType("character varying(100)");
 
-                    b.Property<DateTime?>("UpdatedAtUtc")
-                        .HasColumnType("timestamp with time zone");
+                b.Property<DateTime?>("UpdatedAtUtc")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uuid");
+                b.Property<Guid?>("UserId")
+                    .HasColumnType("uuid");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("ClientId");
+                b.HasIndex("ClientId");
 
-                    b.HasIndex("PurchaseDateUtc");
+                b.HasIndex("PurchaseDateUtc");
 
-                    b.HasIndex("UserId");
+                b.HasIndex("UserId");
 
-                    b.ToTable("deals", (string)null);
-                });
+                b.ToTable("deals", (string)null);
+            });
 
-            modelBuilder.Entity("Crm.Domain.Entities.DealItem", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+        modelBuilder.Entity("Crm.Domain.Entities.DealItem", b =>
+            {
+                b.Property<Guid>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uuid");
 
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("timestamp with time zone");
+                b.Property<DateTime>("CreatedAtUtc")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("DealId")
-                        .HasColumnType("uuid");
+                b.Property<Guid>("DealId")
+                    .HasColumnType("uuid");
 
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uuid");
+                b.Property<Guid>("ProductId")
+                    .HasColumnType("uuid");
 
-                    b.Property<decimal>("Quantity")
-                        .HasPrecision(18, 3)
-                        .HasColumnType("numeric(18,3)");
+                b.Property<decimal>("Quantity")
+                    .HasPrecision(18, 3)
+                    .HasColumnType("numeric(18,3)");
 
-                    b.Property<decimal>("TotalPrice")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("numeric(18,2)");
+                b.Property<decimal>("TotalPrice")
+                    .HasPrecision(18, 2)
+                    .HasColumnType("numeric(18,2)");
 
-                    b.Property<decimal>("UnitPrice")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("numeric(18,2)");
+                b.Property<decimal>("UnitPrice")
+                    .HasPrecision(18, 2)
+                    .HasColumnType("numeric(18,2)");
 
-                    b.Property<DateTime?>("UpdatedAtUtc")
-                        .HasColumnType("timestamp with time zone");
+                b.Property<DateTime?>("UpdatedAtUtc")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("ProductId");
+                b.HasIndex("ProductId");
 
-                    b.HasIndex("DealId", "ProductId");
+                b.HasIndex("DealId", "ProductId");
 
-                    b.ToTable("deal_items", (string)null);
-                });
+                b.ToTable("deal_items", (string)null);
+            });
 
-            modelBuilder.Entity("Crm.Domain.Entities.Product", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+        modelBuilder.Entity("Crm.Domain.Entities.Product", b =>
+            {
+                b.Property<Guid>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uuid");
 
-                    b.Property<decimal>("BasePrice")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("numeric(18,2)");
+                b.Property<decimal>("BasePrice")
+                    .HasPrecision(18, 2)
+                    .HasColumnType("numeric(18,2)");
 
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasColumnType("text");
+                b.Property<string>("Category")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<string>("Color")
-                        .HasColumnType("text");
+                b.Property<string>("Color")
+                    .HasColumnType("text");
 
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("timestamp with time zone");
+                b.Property<DateTime>("CreatedAtUtc")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
+                b.Property<bool>("IsActive")
+                    .HasColumnType("boolean");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
+                b.Property<string>("Name")
+                    .IsRequired()
+                    .HasMaxLength(200)
+                    .HasColumnType("character varying(200)");
 
-                    b.Property<string>("Size")
-                        .HasColumnType("text");
+                b.Property<string>("Size")
+                    .HasColumnType("text");
 
-                    b.Property<DateTime?>("UpdatedAtUtc")
-                        .HasColumnType("timestamp with time zone");
+                b.Property<DateTime?>("UpdatedAtUtc")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("Name", "Category", "Color", "Size");
+                b.HasIndex("Name", "Category", "Color", "Size");
 
-                    b.ToTable("products", (string)null);
-                });
+                b.ToTable("products", (string)null);
+            });
 
-            modelBuilder.Entity("Crm.Domain.Entities.Recommendation", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+        modelBuilder.Entity("Crm.Domain.Entities.Recommendation", b =>
+            {
+                b.Property<Guid>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uuid");
 
-                    b.Property<Guid>("ClientId")
-                        .HasColumnType("uuid");
+                b.Property<Guid>("ClientId")
+                    .HasColumnType("uuid");
 
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("timestamp with time zone");
+                b.Property<DateTime>("CreatedAtUtc")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uuid");
+                b.Property<Guid>("ProductId")
+                    .HasColumnType("uuid");
 
-                    b.Property<string>("Reason")
-                        .HasColumnType("text");
+                b.Property<string>("Reason")
+                    .HasColumnType("text");
 
-                    b.Property<DateTime>("RecommendationDateUtc")
-                        .HasColumnType("timestamp with time zone");
+                b.Property<DateTime>("RecommendationDateUtc")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<decimal>("Score")
-                        .HasPrecision(10, 4)
-                        .HasColumnType("numeric(10,4)");
+                b.Property<decimal>("Score")
+                    .HasPrecision(10, 4)
+                    .HasColumnType("numeric(10,4)");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("text");
+                b.Property<string>("Status")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<DateTime?>("UpdatedAtUtc")
-                        .HasColumnType("timestamp with time zone");
+                b.Property<DateTime?>("UpdatedAtUtc")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("ClientId");
+                b.HasIndex("ClientId");
 
-                    b.HasIndex("ProductId");
+                b.HasIndex("ProductId");
 
-                    b.ToTable("recommendations", (string)null);
-                });
+                b.ToTable("recommendations", (string)null);
+            });
 
-            modelBuilder.Entity("Crm.Domain.Entities.Role", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+        modelBuilder.Entity("Crm.Domain.Entities.Role", b =>
+            {
+                b.Property<Guid>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uuid");
 
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("timestamp with time zone");
+                b.Property<DateTime>("CreatedAtUtc")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
+                b.Property<string>("Description")
+                    .HasColumnType("text");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
+                b.Property<string>("Name")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<DateTime?>("UpdatedAtUtc")
-                        .HasColumnType("timestamp with time zone");
+                b.Property<DateTime?>("UpdatedAtUtc")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("Name")
-                        .IsUnique();
+                b.HasIndex("Name")
+                    .IsUnique();
 
-                    b.ToTable("roles", (string)null);
-                });
+                b.ToTable("roles", (string)null);
+            });
 
-            modelBuilder.Entity("Crm.Domain.Entities.SalesForecast", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+        modelBuilder.Entity("Crm.Domain.Entities.SalesForecast", b =>
+            {
+                b.Property<Guid>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uuid");
 
-                    b.Property<Guid>("ClientId")
-                        .HasColumnType("uuid");
+                b.Property<Guid>("ClientId")
+                    .HasColumnType("uuid");
 
-                    b.Property<decimal?>("ConfidenceScore")
-                        .HasPrecision(5, 4)
-                        .HasColumnType("numeric(5,4)");
+                b.Property<decimal?>("ConfidenceScore")
+                    .HasPrecision(5, 4)
+                    .HasColumnType("numeric(5,4)");
 
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("timestamp with time zone");
+                b.Property<DateTime>("CreatedAtUtc")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("ForecastDateUtc")
-                        .HasColumnType("timestamp with time zone");
+                b.Property<DateTime>("ForecastDateUtc")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("ModelVersion")
-                        .HasColumnType("text");
+                b.Property<string>("ModelVersion")
+                    .HasColumnType("text");
 
-                    b.Property<string>("Notes")
-                        .HasColumnType("text");
+                b.Property<string>("Notes")
+                    .HasColumnType("text");
 
-                    b.Property<DateTime>("PeriodEndUtc")
-                        .HasColumnType("timestamp with time zone");
+                b.Property<DateTime>("PeriodEndUtc")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("PeriodStartUtc")
-                        .HasColumnType("timestamp with time zone");
+                b.Property<DateTime>("PeriodStartUtc")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<decimal>("PredictedAmount")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("numeric(18,2)");
+                b.Property<decimal>("PredictedAmount")
+                    .HasPrecision(18, 2)
+                    .HasColumnType("numeric(18,2)");
 
-                    b.Property<DateTime?>("UpdatedAtUtc")
-                        .HasColumnType("timestamp with time zone");
+                b.Property<DateTime?>("UpdatedAtUtc")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("ClientId");
+                b.HasIndex("ClientId");
 
-                    b.HasIndex("ClientId", "ForecastDateUtc");
+                b.HasIndex("ClientId", "ForecastDateUtc");
 
-                    b.ToTable("sales_forecasts", (string)null);
-                });
+                b.ToTable("sales_forecasts", (string)null);
+            });
 
-            modelBuilder.Entity("Crm.Domain.Entities.TaskItem", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+        modelBuilder.Entity("Crm.Domain.Entities.TaskItem", b =>
+            {
+                b.Property<Guid>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uuid");
 
-                    b.Property<Guid>("AssignedToUserId")
-                        .HasColumnType("uuid");
+                b.Property<Guid>("AssignedToUserId")
+                    .HasColumnType("uuid");
 
-                    b.Property<Guid>("ClientId")
-                        .HasColumnType("uuid");
+                b.Property<Guid>("ClientId")
+                    .HasColumnType("uuid");
 
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("timestamp with time zone");
+                b.Property<DateTime>("CreatedAtUtc")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid?>("DealId")
-                        .HasColumnType("uuid");
+                b.Property<Guid?>("DealId")
+                    .HasColumnType("uuid");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
+                b.Property<string>("Description")
+                    .HasColumnType("text");
 
-                    b.Property<DateTime>("DueDateUtc")
-                        .HasColumnType("timestamp with time zone");
+                b.Property<DateTime>("DueDateUtc")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("text");
+                b.Property<string>("Status")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("text");
+                b.Property<string>("Title")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<DateTime?>("UpdatedAtUtc")
-                        .HasColumnType("timestamp with time zone");
+                b.Property<DateTime?>("UpdatedAtUtc")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("AssignedToUserId");
+                b.HasIndex("AssignedToUserId");
 
-                    b.HasIndex("ClientId");
+                b.HasIndex("ClientId");
 
-                    b.HasIndex("DealId");
+                b.HasIndex("DealId");
 
-                    b.ToTable("task_items", (string)null);
-                });
+                b.ToTable("task_items", (string)null);
+            });
 
-            modelBuilder.Entity("Crm.Domain.Entities.User", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+        modelBuilder.Entity("Crm.Domain.Entities.User", b =>
+            {
+                b.Property<Guid>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uuid");
 
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("timestamp with time zone");
+                b.Property<DateTime>("CreatedAtUtc")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("text");
+                b.Property<string>("Email")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasColumnType("text");
+                b.Property<string>("FirstName")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("text");
+                b.Property<string>("LastName")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<string>("Phone")
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
+                b.Property<string>("Phone")
+                    .HasMaxLength(30)
+                    .HasColumnType("character varying(30)");
 
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("uuid");
+                b.Property<Guid>("RoleId")
+                    .HasColumnType("uuid");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                b.Property<string>("Status")
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .HasColumnType("character varying(50)");
 
-                    b.Property<DateTime?>("UpdatedAtUtc")
-                        .HasColumnType("timestamp with time zone");
+                b.Property<DateTime?>("UpdatedAtUtc")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.HasIndex("Email")
-                        .IsUnique();
+                b.HasIndex("Email")
+                    .IsUnique();
 
-                    b.HasIndex("RoleId");
+                b.HasIndex("RoleId");
 
-                    b.ToTable("users", (string)null);
-                });
+                b.ToTable("users", (string)null);
+            });
 
-            modelBuilder.Entity("Crm.Domain.Entities.Activity", b =>
-                {
-                    b.HasOne("Crm.Domain.Entities.Client", "Client")
-                        .WithMany("Activities")
-                        .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+        modelBuilder.Entity("Crm.Domain.Entities.Activity", b =>
+            {
+                b.HasOne("Crm.Domain.Entities.Client", "Client")
+                    .WithMany("Activities")
+                    .HasForeignKey("ClientId")
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .IsRequired();
 
-                    b.HasOne("Crm.Domain.Entities.Deal", "Deal")
-                        .WithMany("Activities")
-                        .HasForeignKey("DealId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                b.HasOne("Crm.Domain.Entities.Deal", "Deal")
+                    .WithMany("Activities")
+                    .HasForeignKey("DealId")
+                    .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("Crm.Domain.Entities.User", "User")
-                        .WithMany("Activities")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                b.HasOne("Crm.Domain.Entities.User", "User")
+                    .WithMany("Activities")
+                    .HasForeignKey("UserId")
+                    .OnDelete(DeleteBehavior.SetNull);
 
-                    b.Navigation("Client");
+                b.Navigation("Client");
 
-                    b.Navigation("Deal");
+                b.Navigation("Deal");
 
-                    b.Navigation("User");
-                });
+                b.Navigation("User");
+            });
 
-            modelBuilder.Entity("Crm.Domain.Entities.Deal", b =>
-                {
-                    b.HasOne("Crm.Domain.Entities.Client", "Client")
-                        .WithMany("Deals")
-                        .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+        modelBuilder.Entity("Crm.Domain.Entities.Deal", b =>
+            {
+                b.HasOne("Crm.Domain.Entities.Client", "Client")
+                    .WithMany("Deals")
+                    .HasForeignKey("ClientId")
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .IsRequired();
 
-                    b.HasOne("Crm.Domain.Entities.User", "User")
-                        .WithMany("Deals")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                b.HasOne("Crm.Domain.Entities.User", "User")
+                    .WithMany("Deals")
+                    .HasForeignKey("UserId")
+                    .OnDelete(DeleteBehavior.SetNull);
 
-                    b.Navigation("Client");
+                b.Navigation("Client");
 
-                    b.Navigation("User");
-                });
+                b.Navigation("User");
+            });
 
-            modelBuilder.Entity("Crm.Domain.Entities.DealItem", b =>
-                {
-                    b.HasOne("Crm.Domain.Entities.Deal", "Deal")
-                        .WithMany("Items")
-                        .HasForeignKey("DealId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+        modelBuilder.Entity("Crm.Domain.Entities.DealItem", b =>
+            {
+                b.HasOne("Crm.Domain.Entities.Deal", "Deal")
+                    .WithMany("Items")
+                    .HasForeignKey("DealId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
 
-                    b.HasOne("Crm.Domain.Entities.Product", "Product")
-                        .WithMany("DealItems")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                b.HasOne("Crm.Domain.Entities.Product", "Product")
+                    .WithMany("DealItems")
+                    .HasForeignKey("ProductId")
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .IsRequired();
 
-                    b.Navigation("Deal");
+                b.Navigation("Deal");
 
-                    b.Navigation("Product");
-                });
+                b.Navigation("Product");
+            });
 
-            modelBuilder.Entity("Crm.Domain.Entities.Recommendation", b =>
-                {
-                    b.HasOne("Crm.Domain.Entities.Client", "Client")
-                        .WithMany("Recommendations")
-                        .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+        modelBuilder.Entity("Crm.Domain.Entities.Recommendation", b =>
+            {
+                b.HasOne("Crm.Domain.Entities.Client", "Client")
+                    .WithMany("Recommendations")
+                    .HasForeignKey("ClientId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
 
-                    b.HasOne("Crm.Domain.Entities.Product", "Product")
-                        .WithMany("Recommendations")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                b.HasOne("Crm.Domain.Entities.Product", "Product")
+                    .WithMany("Recommendations")
+                    .HasForeignKey("ProductId")
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .IsRequired();
 
-                    b.Navigation("Client");
+                b.Navigation("Client");
 
-                    b.Navigation("Product");
-                });
+                b.Navigation("Product");
+            });
 
-            modelBuilder.Entity("Crm.Domain.Entities.SalesForecast", b =>
-                {
-                    b.HasOne("Crm.Domain.Entities.Client", "Client")
-                        .WithMany("SalesForecasts")
-                        .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+        modelBuilder.Entity("Crm.Domain.Entities.SalesForecast", b =>
+            {
+                b.HasOne("Crm.Domain.Entities.Client", "Client")
+                    .WithMany("SalesForecasts")
+                    .HasForeignKey("ClientId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
 
-                    b.Navigation("Client");
-                });
+                b.Navigation("Client");
+            });
 
-            modelBuilder.Entity("Crm.Domain.Entities.TaskItem", b =>
-                {
-                    b.HasOne("Crm.Domain.Entities.User", "AssignedToUser")
-                        .WithMany("Tasks")
-                        .HasForeignKey("AssignedToUserId")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .IsRequired();
+        modelBuilder.Entity("Crm.Domain.Entities.TaskItem", b =>
+            {
+                b.HasOne("Crm.Domain.Entities.User", "AssignedToUser")
+                    .WithMany("Tasks")
+                    .HasForeignKey("AssignedToUserId")
+                    .OnDelete(DeleteBehavior.SetNull)
+                    .IsRequired();
 
-                    b.HasOne("Crm.Domain.Entities.Client", "Client")
-                        .WithMany("Tasks")
-                        .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                b.HasOne("Crm.Domain.Entities.Client", "Client")
+                    .WithMany("Tasks")
+                    .HasForeignKey("ClientId")
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .IsRequired();
 
-                    b.HasOne("Crm.Domain.Entities.Deal", "Deal")
-                        .WithMany("Tasks")
-                        .HasForeignKey("DealId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                b.HasOne("Crm.Domain.Entities.Deal", "Deal")
+                    .WithMany("Tasks")
+                    .HasForeignKey("DealId")
+                    .OnDelete(DeleteBehavior.SetNull);
 
-                    b.Navigation("AssignedToUser");
+                b.Navigation("AssignedToUser");
 
-                    b.Navigation("Client");
+                b.Navigation("Client");
 
-                    b.Navigation("Deal");
-                });
+                b.Navigation("Deal");
+            });
 
-            modelBuilder.Entity("Crm.Domain.Entities.User", b =>
-                {
-                    b.HasOne("Crm.Domain.Entities.Role", "Role")
-                        .WithMany("Users")
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+        modelBuilder.Entity("Crm.Domain.Entities.User", b =>
+            {
+                b.HasOne("Crm.Domain.Entities.Role", "Role")
+                    .WithMany("Users")
+                    .HasForeignKey("RoleId")
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .IsRequired();
 
-                    b.Navigation("Role");
-                });
+                b.Navigation("Role");
+            });
 
-            modelBuilder.Entity("Crm.Domain.Entities.Client", b =>
-                {
-                    b.Navigation("Activities");
+        modelBuilder.Entity("Crm.Domain.Entities.Client", b =>
+            {
+                b.Navigation("Activities");
 
-                    b.Navigation("Deals");
+                b.Navigation("Deals");
 
-                    b.Navigation("Recommendations");
+                b.Navigation("Recommendations");
 
-                    b.Navigation("SalesForecasts");
+                b.Navigation("SalesForecasts");
 
-                    b.Navigation("Tasks");
-                });
+                b.Navigation("Tasks");
+            });
 
-            modelBuilder.Entity("Crm.Domain.Entities.Deal", b =>
-                {
-                    b.Navigation("Activities");
+        modelBuilder.Entity("Crm.Domain.Entities.Deal", b =>
+            {
+                b.Navigation("Activities");
 
-                    b.Navigation("Items");
+                b.Navigation("Items");
 
-                    b.Navigation("Tasks");
-                });
+                b.Navigation("Tasks");
+            });
 
-            modelBuilder.Entity("Crm.Domain.Entities.Product", b =>
-                {
-                    b.Navigation("DealItems");
+        modelBuilder.Entity("Crm.Domain.Entities.Product", b =>
+            {
+                b.Navigation("DealItems");
 
-                    b.Navigation("Recommendations");
-                });
+                b.Navigation("Recommendations");
+            });
 
-            modelBuilder.Entity("Crm.Domain.Entities.Role", b =>
-                {
-                    b.Navigation("Users");
-                });
+        modelBuilder.Entity("Crm.Domain.Entities.Role", b =>
+            {
+                b.Navigation("Users");
+            });
 
-            modelBuilder.Entity("Crm.Domain.Entities.User", b =>
-                {
-                    b.Navigation("Activities");
+        modelBuilder.Entity("Crm.Domain.Entities.User", b =>
+            {
+                b.Navigation("Activities");
 
-                    b.Navigation("Deals");
+                b.Navigation("Deals");
 
-                    b.Navigation("Tasks");
-                });
+                b.Navigation("Tasks");
+            });
 #pragma warning restore 612, 618
-        }
     }
 }
