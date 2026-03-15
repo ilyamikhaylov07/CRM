@@ -12,6 +12,9 @@ public sealed class User : BaseEntity
     [Column("last_name")]
     public required string LastName { get; set; }
 
+    [Column("keycloak_user_id")]
+    public required string KeycloakUserId { get; set; }
+
     [Column("email")]
     public required string Email { get; set; }
 

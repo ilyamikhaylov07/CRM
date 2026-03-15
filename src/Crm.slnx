@@ -1,3 +1,5 @@
 <Solution>
+  <Project Path="../Auth.Core/Auth.Core.csproj" />
+  <Project Path="../Auth.Keycloak/Auth.Keycloak.csproj" />
   <Project Path="Crm.csproj" />
 </Solution>

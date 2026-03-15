@@ -4,12 +4,12 @@ using Microsoft.AspNetCore.Mvc;
 namespace Crm.Api.Controllers;
 
 [ApiController]
-[Route("[controller]/[action]/Import")]
+[Route("crm/import/")]
 public sealed class ImportController(ShoppingTrendsImportService importService) : ControllerBase
 {
     private readonly ShoppingTrendsImportService _importService = importService;
 
-    [HttpPost("ShoppingTrends")]
+    [HttpPost("shopping-trends")]
     public async Task<IActionResult> ImportShoppingTrends()
     {
         var filePath = @"D:\data\shopping_trends.csv";
