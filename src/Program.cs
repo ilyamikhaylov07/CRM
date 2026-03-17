@@ -9,6 +9,8 @@ using Crm.Infrastructure.Database.Extensions;
 using Crm.Infrastructure.Import;
 using Crm.Infrastructure.Keycloak.Extensions;
 using Crm.Infrastructure.Logging;
+using Crm.Infrastructure.Observability;
+using System.Reflection;
 using System.Text;
 
 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
@@ -26,7 +28,10 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDistributedMemoryCache();
 builder.AddSerilogLogging();
-
+builder.Services.AddCrmTracing(
+    builder.Configuration,
+    "Crm.Api",
+    Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.0.0");
 
 builder.Services.AddCrmAuth(builder.Configuration);
 builder.Services.AddKeycloakJwtAuthentication(builder.Configuration);

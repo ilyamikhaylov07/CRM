@@ -17,6 +17,7 @@ public static class LoggingExtensions
         Log.Logger = new LoggerConfiguration()
             .ReadFrom.Configuration(builder.Configuration)
             .Enrich.FromLogContext()
+            .Enrich.With<ActivityEnricher>()
             .Enrich.WithProperty("Application", builder.Environment.ApplicationName)
             .CreateLogger();
 
