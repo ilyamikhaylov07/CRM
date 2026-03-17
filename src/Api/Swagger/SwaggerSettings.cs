@@ -1,7 +1,7 @@
 ﻿using Microsoft.OpenApi.Models;
 using System.Reflection;
 
-namespace Crm;
+namespace Crm.Api.Swagger;
 
 public static class SwaggerSettings
 {

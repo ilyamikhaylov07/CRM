@@ -13,7 +13,7 @@ public interface IAuthService
     /// <param name="request">Данные для входа.</param>
     /// <param name="cancellationToken">Токен отмены.</param>
     /// <returns>Access и refresh токены.</returns>
-    Task<LoginResponse?> LoginAsync(
+    Task<LoginResponse> LoginAsync(
         LoginRequest request,
         CancellationToken cancellationToken = default);
 }

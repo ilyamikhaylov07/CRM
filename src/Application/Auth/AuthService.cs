@@ -1,5 +1,6 @@
 ﻿using Auth.Keycloak.Settings;
 using Crm.Application.Auth.DTOs;
+using Crm.Application.Common.Exceptions;
 using Microsoft.Extensions.Options;
 using System.Text.Json.Serialization;
 
@@ -10,20 +11,33 @@ namespace Crm.Application.Auth;
 /// </summary>
 public sealed class AuthService(
     IHttpClientFactory httpClientFactory,
-    IOptions<KeycloakJwtSettings> settings) : IAuthService
+    IOptions<KeycloakJwtSettings> settings,
+    ILogger<AuthService> logger) : IAuthService
 {
     private readonly KeycloakJwtSettings _settings = settings.Value;
 
     /// <inheritdoc />
-    public async Task<LoginResponse?> LoginAsync(
+    public async Task<LoginResponse> LoginAsync(
         LoginRequest request,
         CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(request);
-        ArgumentException.ThrowIfNullOrWhiteSpace(request.Email);
-        ArgumentException.ThrowIfNullOrWhiteSpace(request.Password);
+        if (request is null)
+        {
+            throw new ValidationException("Не переданы данные для входа.");
+        }
+
+        if (string.IsNullOrWhiteSpace(request.Email))
+        {
+            throw new ValidationException("Email обязателен.");
+        }
+
+        if (string.IsNullOrWhiteSpace(request.Password))
+        {
+            throw new ValidationException("Пароль обязателен.");
+        }
 
         var tokenEndpoint = BuildTokenEndpoint(_settings.Authority);
+        var emailMasked = MaskEmail(request.Email);
 
         using var httpClient = httpClientFactory.CreateClient();
 
@@ -35,22 +49,66 @@ public sealed class AuthService(
             ["password"] = request.Password
         });
 
-        var response = await httpClient.PostAsync(
-            tokenEndpoint,
-            formContent,
-            cancellationToken);
+        HttpResponseMessage response;
+
+        try
+        {
+            response = await httpClient.PostAsync(
+                tokenEndpoint,
+                formContent,
+                cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception exception)
+        {
+            logger.LogError(
+                exception,
+                "Ошибка обращения к Keycloak при аутентификации. Authority: {Authority}",
+                _settings.Authority);
+            throw new ExternalServiceException(
+                "Не удалось выполнить запрос к Keycloak для получения токена.",
+                exception);
+        }
+
+        if (response.StatusCode == System.Net.HttpStatusCode.BadRequest ||
+            response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+        {
+            logger.LogWarning(
+                "Неуспешная попытка входа. Email: {EmailMasked}",
+                emailMasked);
+            throw new AuthenticationException("Неверный логин или пароль.");
+        }
 
         if (!response.IsSuccessStatusCode)
         {
-            return null;
+            logger.LogError(
+                "Keycloak вернул неуспешный статус при аутентификации. StatusCode: {StatusCode}, Authority: {Authority}",
+                (int)response.StatusCode,
+                _settings.Authority);
+
+            throw new ExternalServiceException(
+                $"Keycloak вернул ошибку при получении токена. Код ответа: {(int)response.StatusCode}.");
         }
 
-        var tokenResponse = await response.Content.ReadFromJsonAsync<KeycloakTokenResponse>(cancellationToken: cancellationToken);
+        var tokenResponse = await response.Content.ReadFromJsonAsync<KeycloakTokenResponse>(
+            cancellationToken: cancellationToken);
 
         if (tokenResponse is null)
         {
-            throw new InvalidOperationException("Keycloak вернул пустой ответ при получении токена.");
+            logger.LogError(
+                "Keycloak вернул пустой ответ при аутентификации. Authority: {Authority}",
+                _settings.Authority);
+
+            throw new ExternalServiceException(
+                "Keycloak вернул пустой ответ при получении токена.");
         }
+
+        logger.LogInformation(
+            "Пользователь успешно аутентифицирован. Email: {EmailMasked}",
+            emailMasked);
 
         return new LoginResponse
         {
@@ -68,6 +126,24 @@ public sealed class AuthService(
     private static string BuildTokenEndpoint(string authority)
     {
         return authority.TrimEnd('/') + "/protocol/openid-connect/token";
+    }
+
+    /// <summary>
+    /// Маскирует email для безопасного логирования.
+    /// </summary>
+    private static string MaskEmail(string email)
+    {
+        var atIndex = email.IndexOf('@');
+
+        if (atIndex <= 1)
+        {
+            return "***";
+        }
+
+        var namePart = email[..atIndex];
+        var domainPart = email[atIndex..];
+
+        return $"{namePart[0]}***{domainPart}";
     }
 
     /// <summary>

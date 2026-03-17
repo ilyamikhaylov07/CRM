@@ -1,4 +1,5 @@
-﻿using Crm.Application.Users.DTOs;
+﻿using Crm.Application.Common.Exceptions;
+using Crm.Application.Users.DTOs;
 using Crm.Domain.Entities;
 using Crm.Domain.Enums;
 using Crm.Infrastructure.Database;
@@ -12,7 +13,8 @@ namespace Crm.Application.Users;
 /// </summary>
 public sealed class UserProvisioningService(
     CrmDbContext dbContext,
-    IKeycloakAdminService keycloakAdminService
+    IKeycloakAdminService keycloakAdminService,
+    ILogger<UserProvisioningService> logger
     ) : IUserProvisioningService
 {
     /// <inheritdoc />
@@ -28,8 +30,7 @@ public sealed class UserProvisioningService(
 
         if (existingUserInDb is not null)
         {
-            throw new InvalidOperationException(
-                $"Пользователь с email '{request.Email}' уже существует в базе данных.");
+            throw new ConflictException($"Пользователь с email '{request.Email}' уже существует в базе данных.");
         }
 
         var existingKeycloakUserId = await keycloakAdminService.FindUserIdByEmailAsync(
@@ -38,14 +39,12 @@ public sealed class UserProvisioningService(
 
         if (!string.IsNullOrWhiteSpace(existingKeycloakUserId))
         {
-            throw new InvalidOperationException(
-                $"Пользователь с email '{request.Email}' уже существует в Keycloak.");
+            throw new ConflictException($"Пользователь с email '{request.Email}' уже существует в Keycloak.");
         }
 
         var role = await dbContext.Roles
-            .FirstOrDefaultAsync(x => x.Name == request.RoleName, cancellationToken)
-            ?? throw new InvalidOperationException(
-                $"Роль '{request.RoleName}' не найдена в базе данных.");
+             .FirstOrDefaultAsync(x => x.Name == request.RoleName, cancellationToken)
+             ?? throw new NotFoundException($"Роль '{request.RoleName}' не найдена.");
 
         string? keycloakUserId = null;
 
@@ -86,10 +85,27 @@ public sealed class UserProvisioningService(
             await dbContext.Users.AddAsync(user, cancellationToken);
             await dbContext.SaveChangesAsync(cancellationToken);
 
+            logger.LogInformation(
+                "Пользователь успешно создан администратором. UserId: {UserId}, KeycloakUserId: {KeycloakUserId}, Role: {Role}",
+                user.Id,
+                user.KeycloakUserId,
+                role.Name);
+
             return user.Id;
         }
-        catch
+        catch (OperationCanceledException)
         {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(
+                ex,
+                "Ошибка при создании пользователя администратором. Email: {Email}, Role: {Role}, KeycloakUserId: {KeycloakUserId}",
+                request.Email,
+                request.RoleName,
+                keycloakUserId);
+
             if (!string.IsNullOrWhiteSpace(keycloakUserId))
             {
                 try
@@ -97,10 +113,19 @@ public sealed class UserProvisioningService(
                     await keycloakAdminService.DeleteUserAsync(
                         keycloakUserId,
                         cancellationToken);
+
+                    logger.LogWarning(
+                        "Выполнена компенсация после ошибки создания пользователя: пользователь удален из Keycloak. Email: {Email}, KeycloakUserId: {KeycloakUserId}",
+                        request.Email,
+                        keycloakUserId);
                 }
-                catch
+                catch (Exception compensationException)
                 {
-                    // позже можно добавить логирование
+                    logger.LogError(
+                        compensationException,
+                        "Не удалось выполнить компенсацию после ошибки создания пользователя. Возможен рассинхрон между Keycloak и БД. Email: {Email}, KeycloakUserId: {KeycloakUserId}",
+                        request.Email,
+                        keycloakUserId);
                 }
             }
 
