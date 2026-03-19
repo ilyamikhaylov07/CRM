@@ -6,10 +6,13 @@ using Crm.Application.Auth;
 using Crm.Application.Users;
 using Crm.Infrastructure.Database;
 using Crm.Infrastructure.Database.Extensions;
+using Crm.Infrastructure.HealthChecks;
 using Crm.Infrastructure.Import;
 using Crm.Infrastructure.Keycloak.Extensions;
 using Crm.Infrastructure.Logging;
 using Crm.Infrastructure.Observability;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using System.Reflection;
 using System.Text;
 
@@ -28,7 +31,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDistributedMemoryCache();
 builder.AddSerilogLogging();
-builder.Services.AddCrmTracing(
+builder.Services.AddCrmObservability(
     builder.Configuration,
     "Crm.Api",
     Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.0.0");
@@ -36,6 +39,10 @@ builder.Services.AddCrmTracing(
 builder.Services.AddCrmAuth(builder.Configuration);
 builder.Services.AddKeycloakJwtAuthentication(builder.Configuration);
 builder.Services.AddCrmKeycloakAdmin(builder.Configuration);
+
+builder.Services.AddHealthChecks()
+    .AddCheck<KeycloakHealthCheck>("keycloak", tags: new[] { "ready" })
+    .AddCheck("self", () => HealthCheckResult.Healthy(), tags: new[] { "live" });
 
 builder.Services.AddCrmPersistence(builder.Configuration);
 builder.Services.AddScoped<ShoppingTrendsImportService>();
@@ -52,6 +59,17 @@ var app = builder.Build();
 app.UseSerilogRequestLoggingMiddleware();
 app.UseGlobalExceptionHandling();
 
+app.MapHealthChecks("/health/live", new HealthCheckOptions
+{
+    Predicate = check => check.Tags.Contains("live")
+});
+
+app.MapHealthChecks("/health/ready", new HealthCheckOptions
+{
+    Predicate = check => check.Tags.Contains("ready")
+});
+
+app.UseCrmObservability();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
