@@ -2,7 +2,13 @@ using Auth.Core.Extensions;
 using Auth.Keycloak.Extensions;
 using Crm.Api.Middleware;
 using Crm.Api.Swagger;
+using Crm.Application.Activities;
 using Crm.Application.Auth;
+using Crm.Application.Clients;
+using Crm.Application.DealItems;
+using Crm.Application.Deals;
+using Crm.Application.Products;
+using Crm.Application.Tasks;
 using Crm.Application.Users;
 using Crm.Infrastructure.Database;
 using Crm.Infrastructure.Database.Extensions;
@@ -51,8 +57,14 @@ builder.Services.AddScoped<RoleSeeder>();
 builder.Services.AddScoped<IUserProvisioningService, UserProvisioningService>();
 builder.Services.AddScoped<IUserQueryService, UserQueryService>();
 builder.Services.AddScoped<IUserManagementService, UserManagementService>();
-
+builder.Services.AddScoped<IClientService, ClientService>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IDealService, DealService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IDealAmountCalculator, DealAmountCalculator>();
+builder.Services.AddScoped<IDealItemService, DealItemService>();
+builder.Services.AddScoped<ITaskService, TaskService>();
+builder.Services.AddScoped<IActivityService, ActivityService>();
 
 var app = builder.Build();
 
