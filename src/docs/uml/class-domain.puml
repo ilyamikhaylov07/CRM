@@ -1,0 +1,168 @@
+@startuml
+hide empty members
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam linetype ortho
+skinparam nodesep 60
+skinparam ranksep 75
+skinparam packageStyle rectangle
+skinparam ArrowColor #334155
+skinparam ArrowThickness 1.2
+
+title CRM Class Diagram - Domain Model
+left to right direction
+
+package "Common" {
+  abstract class BaseEntity {
+    +Id : Guid
+    +CreatedAtUtc : DateTime
+    +UpdatedAtUtc : DateTime?
+  }
+}
+
+package "Entities" {
+  class Role {
+    +Name : string
+    +Description : string?
+  }
+
+  class User {
+    +FirstName : string
+    +LastName : string
+    +KeycloakUserId : string
+    +Email : string
+    +Phone : string?
+    +Status : UserStatus
+    +RoleId : Guid
+  }
+
+  class Client {
+    +ExternalId : string
+    +Name : string
+    +Age : int
+    +Gender : string
+    +Location : string
+    +PreviousPurchases : int
+    +FrequencyOfPurchases : string
+  }
+
+  class Product {
+    +Name : string
+    +Category : string
+    +Color : string?
+    +Size : string?
+    +BasePrice : decimal
+    +IsActive : bool
+  }
+
+  class Deal {
+    +ClientId : Guid
+    +UserId : Guid?
+    +PurchaseAmount : decimal
+    +PurchaseDateUtc : DateTime
+    +Season : string
+    +PaymentMethod : string
+    +DiscountApplied : bool
+    +PromoCodeUsed : bool
+    +ReviewRating : decimal
+    +ShippingType : string?
+  }
+
+  class DealItem {
+    +DealId : Guid
+    +ProductId : Guid
+    +Quantity : decimal
+    +UnitPrice : decimal
+    +TotalPrice : decimal
+  }
+
+  class Activity {
+    +Type : ActivityType
+    +Subject : string?
+    +Description : string?
+    +ActivityDateUtc : DateTime
+    +UserId : Guid?
+    +ClientId : Guid
+    +DealId : Guid?
+  }
+
+  class TaskItem {
+    +Title : string
+    +Description : string?
+    +DueDateUtc : DateTime
+    +Status : TaskStatus
+    +AssignedToUserId : Guid?
+    +ClientId : Guid
+    +DealId : Guid?
+  }
+
+  class SalesForecast {
+    +ClientId : Guid
+    +ForecastDateUtc : DateTime
+    +PeriodStartUtc : DateTime
+    +PeriodEndUtc : DateTime
+    +PredictedAmount : decimal
+    +ConfidenceScore : decimal?
+    +ModelVersion : string?
+    +Notes : string?
+  }
+
+  class Recommendation {
+    +ClientId : Guid
+    +ProductId : Guid
+    +RecommendationDateUtc : DateTime
+    +Score : decimal
+    +Reason : string?
+    +Status : RecommendationStatus
+  }
+}
+
+package "Enums" {
+  enum ActivityType
+  enum RecommendationStatus
+  enum TaskStatus
+  enum UserStatus
+}
+
+Role -[hidden]right- User
+User -[hidden]right- Client
+Client -[hidden]right- Deal
+Deal -[hidden]right- DealItem
+DealItem -[hidden]right- Product
+Activity -[hidden]down- Client
+TaskItem -[hidden]down- Deal
+SalesForecast -[hidden]down- TaskItem
+Recommendation -[hidden]right- SalesForecast
+
+BaseEntity <|-- Role
+BaseEntity <|-- User
+BaseEntity <|-- Client
+BaseEntity <|-- Product
+BaseEntity <|-- Deal
+BaseEntity <|-- DealItem
+BaseEntity <|-- Activity
+BaseEntity <|-- TaskItem
+BaseEntity <|-- SalesForecast
+BaseEntity <|-- Recommendation
+
+Role ||--o{ User
+Client ||--o{ Deal
+User |o--o{ Deal
+Deal ||--o{ DealItem
+Product ||--o{ DealItem
+Client ||--o{ Activity
+User |o--o{ Activity
+Deal |o--o{ Activity
+Client ||--o{ TaskItem
+User |o--o{ TaskItem : assignedTo
+Deal |o--o{ TaskItem
+Client ||--o{ SalesForecast
+Client ||--o{ Recommendation
+Product ||--o{ Recommendation
+
+Activity --> ActivityType
+Recommendation --> RecommendationStatus
+TaskItem --> TaskStatus
+User --> UserStatus
+
+@enduml

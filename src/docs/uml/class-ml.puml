@@ -1,0 +1,117 @@
+@startuml
+hide empty members
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam linetype ortho
+skinparam nodesep 60
+skinparam ranksep 75
+skinparam packageStyle rectangle
+skinparam ArrowColor #334155
+skinparam ArrowThickness 1.2
+
+title CRM Class Diagram - ML Subsystem
+left to right direction
+
+package "Orchestration" {
+  interface IMachineLearningOrchestrator
+  class MachineLearningOrchestrator {
+    +RunAsync()
+    +GenerateForecastsAsync()
+    +GenerateRecommendationsAsync()
+  }
+}
+
+package "Forecasting" {
+  interface IForecastTrainingDataService
+  interface IForecastModelService
+
+  class ForecastTrainingDataService
+  class ForecastModelService
+  class ClientForecastFeatureSnapshot
+  class ForecastTrainingRow
+  class ForecastPredictionInput
+  class ForecastPredictionOutput
+  class ForecastModelInfo
+}
+
+package "Recommendations" {
+  interface IRecommendationTrainingDataService
+  interface IRecommendationModelService
+  interface IHeuristicRecommendationScorer
+  interface IRecommendationEngineService
+
+  class RecommendationTrainingDataService
+  class RecommendationModelService
+  class HeuristicRecommendationScorer
+  class RecommendationEngineService
+  class RecommendationTrainingDataSet
+  class RecommendationTrainingRow
+  class RecommendationPredictionInput
+  class RecommendationPredictionOutput
+  class RecommendationModelInfo
+  class RecommendationTrainingStatistics
+}
+
+package "Persistence" {
+  class CrmDbContext
+  class SalesForecast
+  class Recommendation
+  class Client
+  class Product
+  class DealItem
+}
+
+MachineLearningOrchestrator -[hidden]right- IForecastModelService
+IForecastModelService -[hidden]right- IRecommendationEngineService
+IForecastTrainingDataService -[hidden]down- ForecastTrainingDataService
+IForecastModelService -[hidden]down- ForecastModelService
+IRecommendationTrainingDataService -[hidden]down- RecommendationTrainingDataService
+IRecommendationModelService -[hidden]down- RecommendationModelService
+IHeuristicRecommendationScorer -[hidden]down- HeuristicRecommendationScorer
+IRecommendationEngineService -[hidden]down- RecommendationEngineService
+RecommendationEngineService -[hidden]right- CrmDbContext
+
+MachineLearningOrchestrator ..|> IMachineLearningOrchestrator
+MachineLearningOrchestrator --> IForecastModelService
+MachineLearningOrchestrator --> IForecastTrainingDataService
+MachineLearningOrchestrator --> IRecommendationEngineService
+MachineLearningOrchestrator --> CrmDbContext
+MachineLearningOrchestrator --> SalesForecast
+MachineLearningOrchestrator --> Recommendation
+
+ForecastTrainingDataService ..|> IForecastTrainingDataService
+ForecastModelService ..|> IForecastModelService
+RecommendationTrainingDataService ..|> IRecommendationTrainingDataService
+RecommendationModelService ..|> IRecommendationModelService
+HeuristicRecommendationScorer ..|> IHeuristicRecommendationScorer
+RecommendationEngineService ..|> IRecommendationEngineService
+
+ForecastTrainingDataService --> CrmDbContext
+ForecastTrainingDataService --> ForecastTrainingRow
+ForecastTrainingDataService --> ClientForecastFeatureSnapshot
+
+ForecastModelService --> IForecastTrainingDataService
+ForecastModelService --> ForecastTrainingRow
+ForecastModelService --> ForecastPredictionInput
+ForecastModelService --> ForecastPredictionOutput
+ForecastModelService --> ForecastModelInfo
+
+RecommendationTrainingDataService --> CrmDbContext
+RecommendationTrainingDataService --> RecommendationTrainingDataSet
+RecommendationTrainingDataService --> RecommendationTrainingRow
+RecommendationTrainingDataService --> RecommendationTrainingStatistics
+RecommendationTrainingDataService --> DealItem
+
+RecommendationModelService --> IRecommendationTrainingDataService
+RecommendationModelService --> RecommendationPredictionInput
+RecommendationModelService --> RecommendationPredictionOutput
+RecommendationModelService --> RecommendationModelInfo
+
+RecommendationEngineService --> IRecommendationModelService
+RecommendationEngineService --> IHeuristicRecommendationScorer
+RecommendationEngineService --> CrmDbContext
+RecommendationEngineService --> Client
+RecommendationEngineService --> Product
+RecommendationEngineService --> Recommendation
+
+@enduml

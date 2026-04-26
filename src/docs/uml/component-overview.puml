@@ -1,0 +1,133 @@
+@startuml
+title CRM - UML Component Diagram
+
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam linetype ortho
+skinparam nodesep 45
+skinparam ranksep 55
+skinparam padding 6
+skinparam pageMargin 10
+skinparam component {
+  Padding 8
+  Margin 8
+}
+left to right direction
+scale max 1748*2480
+
+interface "REST API" as IRest
+interface "JWT/OIDC" as IJwt
+interface "Admin REST API" as IKeycloakAdmin
+interface "Relational persistence" as IPersistence
+interface "Metrics scrape" as IMetrics
+interface "OTLP traces" as ITraces
+interface "Model files" as IModelFiles
+interface "Import file" as IImportFile
+
+component "Web / API client" as Client
+
+package "CRM API deployable\nCrm.csproj, net10.0" as Crm {
+  component "API Layer" as Api <<ASP.NET Core>> {
+    component "Controllers" as Controllers
+    component "ExceptionHandlingMiddleware" as ExceptionMiddleware
+    component "Health checks" as HealthChecks
+    component "Swagger" as Swagger
+  }
+
+  component "Auth Integration" as Auth <<Project references>> {
+    component "Auth.Core" as AuthCore
+    component "Auth.Keycloak" as AuthKeycloak
+  }
+
+  component "Application Layer" as Application <<Services>> {
+    component "CRM services" as CrmServices
+    component "User services" as UserServices
+    component "Import helper" as ImportHelper
+  }
+
+  component "ML Layer" as Ml <<ML.NET>> {
+    component "ForecastModelService" as ForecastModel
+    component "RecommendationModelService" as RecommendationModel
+    component "MachineLearningOrchestrator" as MlOrchestrator
+  }
+
+  component "Infrastructure Layer" as Infrastructure <<Adapters>> {
+    component "CrmDbContext" as DbContext <<EF Core>>
+    component "KeycloakAdminService" as KeycloakAdminService
+    component "ShoppingTrendsImportService" as ImportService
+    component "ObservabilityExtensions" as Observability
+    component "Serilog logging" as Logging
+  }
+
+  component "Domain Layer" as Domain <<Domain model>> {
+    component "Entities" as Entities
+    component "Enums" as Enums
+    component "System roles" as Roles
+  }
+}
+
+component "PostgreSQL" as Postgres <<Database>>
+component "Keycloak" as Keycloak <<Identity Provider>>
+component "Local model storage" as ModelStore <<File system>>
+component "Shopping trends source" as ImportFiles <<File>>
+component "OTLP collector" as Otlp <<Observability>>
+component "Prometheus" as Prometheus <<Observability>>
+component "Console sink" as Console <<Logging>>
+
+Client ..> IRest : HTTP-запросы
+Api - IRest : предоставляет REST API
+Api ..> IJwt : JWT-проверка
+
+AuthKeycloak ..> IJwt : проверка токена
+Keycloak - IJwt : метаданные
+KeycloakAdminService ..> IKeycloakAdmin : админ-запросы
+Keycloak - IKeycloakAdmin : админ-API
+
+DbContext ..> IPersistence : EF Core
+Postgres - IPersistence : данные CRM
+Observability ..> ITraces : экспорт
+Otlp - ITraces : прием
+Prometheus ..> IMetrics : сбор
+Observability - IMetrics : /metrics
+ForecastModel ..> IModelFiles : модель прогноза
+RecommendationModel ..> IModelFiles : модель рекомендаций
+ModelStore - IModelFiles : файлы
+ImportService ..> IImportFile : чтение
+ImportFiles - IImportFile : данные
+
+Controllers --> CrmServices : CRM
+Controllers --> UserServices : пользователи
+Controllers --> ImportHelper : импорт
+Controllers --> MlOrchestrator : машинное обучение
+Controllers --> AuthCore : авторизация
+ExceptionMiddleware --> Application : ошибки
+HealthChecks --> KeycloakAdminService : проверка
+
+AuthCore --> AuthKeycloak : роли
+AuthCore --> Roles : политики
+
+CrmServices --> DbContext : CRUD
+UserServices --> DbContext : CRUD пользователей
+UserServices --> KeycloakAdminService : синхронизация
+ImportHelper --> ImportService : импорт
+ImportService --> DbContext : запись
+CrmServices --> Entities : сущности
+CrmServices --> Enums : перечисления
+UserServices --> Entities : пользователь
+
+MlOrchestrator --> ForecastModel : обучение/прогноз
+MlOrchestrator --> RecommendationModel : обучение/рекомендации
+ForecastModel --> DbContext : обучающие данные
+RecommendationModel --> DbContext : обучающие данные
+
+Api --> Observability : телеметрия
+Api --> Logging : логи
+Logging --> Console : консоль
+
+note right of Crm
+  Подпись на стрелке показывает действие источника к цели.
+  Сервис развертывается как единый ASP.NET Core API.
+end note
+
+@enduml

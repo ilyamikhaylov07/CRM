@@ -1,0 +1,212 @@
+@startuml
+hide empty members
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam linetype ortho
+skinparam nodesep 70
+skinparam ranksep 80
+skinparam packageStyle rectangle
+skinparam ArrowColor #334155
+skinparam ArrowThickness 1.2
+
+title CRM Class Diagram - Layer Overview
+left to right direction
+
+package "API Layer" as api {
+  class "ActivitiesController" as ActivitiesController
+  class "AuthController" as AuthController
+  class "ClientsController" as ClientsController
+  class "DealItemsController" as DealItemsController
+  class "DealsController" as DealsController
+  class "ForecastsController" as ForecastsController
+  class "HelpersController" as HelpersController
+  class "ImportController" as ImportController
+  class "MachineLearningController" as MachineLearningController
+  class "ProductsController" as ProductsController
+  class "RecommendationsController" as RecommendationsController
+  class "TasksController" as TasksController
+  class "UsersController" as UsersController
+  class "ExceptionHandlingMiddleware" as ExceptionHandlingMiddleware
+}
+
+package "Application Layer" as app {
+  interface "IActivityService" as IActivityService
+  interface "IAuthService" as IAuthService
+  interface "IClientService" as IClientService
+  interface "IDealService" as IDealService
+  interface "IDealItemService" as IDealItemService
+  interface "IForecastService" as IForecastService
+  interface "IProductService" as IProductService
+  interface "IRecommendationService" as IRecommendationService
+  interface "ITaskService" as ITaskService
+  interface "IUserProvisioningService" as IUserProvisioningService
+  interface "IUserQueryService" as IUserQueryService
+  interface "IUserManagementService" as IUserManagementService
+  interface "IMachineLearningOrchestrator" as IMachineLearningOrchestrator
+  interface "IRecommendationDataSeedHelper" as IRecommendationDataSeedHelper
+
+  class "ActivityService" as ActivityService
+  class "AuthService" as AuthService
+  class "ClientService" as ClientService
+  class "DealService" as DealService
+  class "DealAmountCalculator" as DealAmountCalculator
+  class "DealItemService" as DealItemService
+  class "ForecastService" as ForecastService
+  class "ProductService" as ProductService
+  class "RecommendationService" as RecommendationService
+  class "TaskService" as TaskService
+  class "UserProvisioningService" as UserProvisioningService
+  class "UserQueryService" as UserQueryService
+  class "UserManagementService" as UserManagementService
+  class "MachineLearningOrchestrator" as MachineLearningOrchestrator
+  class "RecommendationDataSeedHelper" as RecommendationDataSeedHelper
+}
+
+package "Domain Layer" as domain {
+  abstract class "BaseEntity" as BaseEntity
+  class "User" as User
+  class "Role" as Role
+  class "Client" as Client
+  class "Product" as Product
+  class "Deal" as Deal
+  class "DealItem" as DealItem
+  class "Activity" as Activity
+  class "TaskItem" as TaskItem
+  class "SalesForecast" as SalesForecast
+  class "Recommendation" as Recommendation
+}
+
+package "Infrastructure Layer" as infra {
+  class "CrmDbContext" as CrmDbContext
+  interface "IKeycloakAdminService" as IKeycloakAdminService
+  class "KeycloakAdminService" as KeycloakAdminService
+  class "ShoppingTrendsImportService" as ShoppingTrendsImportService
+  class "RoleSeeder" as RoleSeeder
+  class "ActivityConfiguration" as ActivityConfiguration
+  class "ClientConfiguration" as ClientConfiguration
+  class "DealConfiguration" as DealConfiguration
+  class "DealItemConfiguration" as DealItemConfiguration
+  class "ProductConfiguration" as ProductConfiguration
+  class "RecommendationConfiguration" as RecommendationConfiguration
+  class "RoleConfiguration" as RoleConfiguration
+  class "SalesForecastConfiguration" as SalesForecastConfiguration
+  class "TaskItemConfiguration" as TaskItemConfiguration
+  class "UserConfiguration" as UserConfiguration
+}
+
+package "ML Subsystem" as ml {
+  interface "IForecastTrainingDataService" as IForecastTrainingDataService
+  interface "IForecastModelService" as IForecastModelService
+  interface "IRecommendationTrainingDataService" as IRecommendationTrainingDataService
+  interface "IRecommendationModelService" as IRecommendationModelService
+  interface "IHeuristicRecommendationScorer" as IHeuristicRecommendationScorer
+  interface "IRecommendationEngineService" as IRecommendationEngineService
+
+  class "ForecastTrainingDataService" as ForecastTrainingDataService
+  class "ForecastModelService" as ForecastModelService
+  class "RecommendationTrainingDataService" as RecommendationTrainingDataService
+  class "RecommendationModelService" as RecommendationModelService
+  class "HeuristicRecommendationScorer" as HeuristicRecommendationScorer
+  class "RecommendationEngineService" as RecommendationEngineService
+}
+
+api -[hidden]right- app
+app -[hidden]right- infra
+infra -[hidden]right- ml
+domain -[hidden]down- app
+
+ActivitiesController --> IActivityService
+AuthController --> IAuthService
+ClientsController --> IClientService
+DealItemsController --> IDealItemService
+DealsController --> IDealService
+ForecastsController --> IForecastService
+HelpersController --> IRecommendationDataSeedHelper
+ImportController --> ShoppingTrendsImportService
+MachineLearningController --> IMachineLearningOrchestrator
+ProductsController --> IProductService
+RecommendationsController --> IRecommendationService
+TasksController --> ITaskService
+UsersController --> IUserProvisioningService
+UsersController --> IUserQueryService
+UsersController --> IUserManagementService
+
+ActivityService ..|> IActivityService
+AuthService ..|> IAuthService
+ClientService ..|> IClientService
+DealService ..|> IDealService
+DealItemService ..|> IDealItemService
+ForecastService ..|> IForecastService
+ProductService ..|> IProductService
+RecommendationService ..|> IRecommendationService
+TaskService ..|> ITaskService
+UserProvisioningService ..|> IUserProvisioningService
+UserQueryService ..|> IUserQueryService
+UserManagementService ..|> IUserManagementService
+MachineLearningOrchestrator ..|> IMachineLearningOrchestrator
+RecommendationDataSeedHelper ..|> IRecommendationDataSeedHelper
+
+ActivityService --> CrmDbContext
+ClientService --> CrmDbContext
+DealService --> CrmDbContext
+DealAmountCalculator --> CrmDbContext
+DealItemService --> CrmDbContext
+ForecastService --> CrmDbContext
+ProductService --> CrmDbContext
+RecommendationService --> CrmDbContext
+TaskService --> CrmDbContext
+UserProvisioningService --> CrmDbContext
+UserQueryService --> CrmDbContext
+UserManagementService --> CrmDbContext
+RecommendationDataSeedHelper --> CrmDbContext
+
+UserProvisioningService --> IKeycloakAdminService
+UserManagementService --> IKeycloakAdminService
+AuthService --> IKeycloakAdminService
+
+KeycloakAdminService ..|> IKeycloakAdminService
+CrmDbContext --> BaseEntity
+CrmDbContext --> User
+CrmDbContext --> Role
+CrmDbContext --> Client
+CrmDbContext --> Product
+CrmDbContext --> Deal
+CrmDbContext --> DealItem
+CrmDbContext --> Activity
+CrmDbContext --> TaskItem
+CrmDbContext --> SalesForecast
+CrmDbContext --> Recommendation
+
+ActivityConfiguration --> Activity
+ClientConfiguration --> Client
+DealConfiguration --> Deal
+DealItemConfiguration --> DealItem
+ProductConfiguration --> Product
+RecommendationConfiguration --> Recommendation
+RoleConfiguration --> Role
+SalesForecastConfiguration --> SalesForecast
+TaskItemConfiguration --> TaskItem
+UserConfiguration --> User
+RoleSeeder --> CrmDbContext
+
+MachineLearningOrchestrator --> IForecastModelService
+MachineLearningOrchestrator --> IForecastTrainingDataService
+MachineLearningOrchestrator --> IRecommendationEngineService
+MachineLearningOrchestrator --> CrmDbContext
+
+ForecastTrainingDataService ..|> IForecastTrainingDataService
+ForecastModelService ..|> IForecastModelService
+RecommendationTrainingDataService ..|> IRecommendationTrainingDataService
+RecommendationModelService ..|> IRecommendationModelService
+HeuristicRecommendationScorer ..|> IHeuristicRecommendationScorer
+RecommendationEngineService ..|> IRecommendationEngineService
+
+ForecastTrainingDataService --> CrmDbContext
+ForecastModelService --> IForecastTrainingDataService
+RecommendationTrainingDataService --> CrmDbContext
+RecommendationModelService --> IRecommendationTrainingDataService
+RecommendationEngineService --> IRecommendationModelService
+RecommendationEngineService --> IHeuristicRecommendationScorer
+RecommendationEngineService --> CrmDbContext
+
+@enduml

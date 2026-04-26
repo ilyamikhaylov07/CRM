@@ -7,7 +7,14 @@
     <UserSecretsId>5c2a5436-089b-47e9-8bac-ed566f99f6f1</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 	<GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);NU1902</NoWarn>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Crm.Tests\**\*.cs" />
+    <Content Remove="Crm.Tests\**\*" />
+    <None Remove="Crm.Tests\**\*" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.ML" Version="5.0.0" />

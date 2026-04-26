@@ -2,4 +2,5 @@
   <Project Path="../Auth.Core/Auth.Core.csproj" />
   <Project Path="../Auth.Keycloak/Auth.Keycloak.csproj" />
   <Project Path="Crm.csproj" />
+  <Project Path="Crm.Tests/Crm.Tests.csproj" />
 </Solution>

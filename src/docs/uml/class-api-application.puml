@@ -1,0 +1,187 @@
+@startuml
+hide empty members
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam linetype ortho
+skinparam nodesep 60
+skinparam ranksep 75
+skinparam packageStyle rectangle
+skinparam ArrowColor #334155
+skinparam ArrowThickness 1.2
+
+title CRM Class Diagram - API and Application
+left to right direction
+
+package "API" {
+  class ActivitiesController
+  class AuthController
+  class ClientsController
+  class DealItemsController
+  class DealsController
+  class ForecastsController
+  class HelpersController
+  class ImportController
+  class MachineLearningController
+  class ProductsController
+  class RecommendationsController
+  class TasksController
+  class UsersController
+  class ExceptionHandlingMiddleware {
+    +InvokeAsync(context)
+  }
+}
+
+package "Application Contracts" {
+  interface IActivityService
+  interface IAuthService
+  interface IClientService
+  interface IDealService
+  interface IDealItemService
+  interface IForecastService
+  interface IProductService
+  interface IRecommendationService
+  interface ITaskService
+  interface IUserProvisioningService
+  interface IUserQueryService
+  interface IUserManagementService
+  interface IMachineLearningOrchestrator
+  interface IRecommendationDataSeedHelper
+  interface IDealAmountCalculator
+}
+
+package "Application Services" {
+  class ActivityService
+  class AuthService
+  class ClientService
+  class DealService
+  class DealItemService
+  class DealAmountCalculator
+  class ForecastService
+  class ProductService
+  class RecommendationService
+  class TaskService
+  class UserProvisioningService
+  class UserQueryService
+  class UserManagementService
+  class MachineLearningOrchestrator
+  class RecommendationDataSeedHelper
+}
+
+package "Infrastructure Entry Points" {
+  class CrmDbContext
+  class ShoppingTrendsImportService
+  interface IKeycloakAdminService
+}
+
+together {
+  class ActivitiesController
+  class AuthController
+  class ClientsController
+  class DealItemsController
+  class DealsController
+  class ForecastsController
+  class HelpersController
+  class ImportController
+  class MachineLearningController
+  class ProductsController
+  class RecommendationsController
+  class TasksController
+  class UsersController
+}
+
+together {
+  interface IActivityService
+  interface IAuthService
+  interface IClientService
+  interface IDealService
+  interface IDealItemService
+  interface IForecastService
+  interface IProductService
+  interface IRecommendationService
+  interface ITaskService
+  interface IUserProvisioningService
+  interface IUserQueryService
+  interface IUserManagementService
+  interface IMachineLearningOrchestrator
+  interface IRecommendationDataSeedHelper
+  interface IDealAmountCalculator
+}
+
+together {
+  class ActivityService
+  class AuthService
+  class ClientService
+  class DealService
+  class DealItemService
+  class DealAmountCalculator
+  class ForecastService
+  class ProductService
+  class RecommendationService
+  class TaskService
+  class UserProvisioningService
+  class UserQueryService
+  class UserManagementService
+  class MachineLearningOrchestrator
+  class RecommendationDataSeedHelper
+}
+
+ActivitiesController -[hidden]right- IActivityService
+IActivityService -[hidden]right- ActivityService
+ActivityService -[hidden]right- CrmDbContext
+
+ActivitiesController --> IActivityService
+AuthController --> IAuthService
+ClientsController --> IClientService
+DealItemsController --> IDealItemService
+DealsController --> IDealService
+ForecastsController --> IForecastService
+HelpersController --> IRecommendationDataSeedHelper
+ImportController --> ShoppingTrendsImportService
+MachineLearningController --> IMachineLearningOrchestrator
+ProductsController --> IProductService
+RecommendationsController --> IRecommendationService
+TasksController --> ITaskService
+UsersController --> IUserProvisioningService
+UsersController --> IUserQueryService
+UsersController --> IUserManagementService
+ExceptionHandlingMiddleware ..> IAuthService : handles exceptions from
+ExceptionHandlingMiddleware ..> IClientService
+ExceptionHandlingMiddleware ..> IDealService
+ExceptionHandlingMiddleware ..> ITaskService
+
+ActivityService ..|> IActivityService
+AuthService ..|> IAuthService
+ClientService ..|> IClientService
+DealService ..|> IDealService
+DealItemService ..|> IDealItemService
+DealAmountCalculator ..|> IDealAmountCalculator
+ForecastService ..|> IForecastService
+ProductService ..|> IProductService
+RecommendationService ..|> IRecommendationService
+TaskService ..|> ITaskService
+UserProvisioningService ..|> IUserProvisioningService
+UserQueryService ..|> IUserQueryService
+UserManagementService ..|> IUserManagementService
+MachineLearningOrchestrator ..|> IMachineLearningOrchestrator
+RecommendationDataSeedHelper ..|> IRecommendationDataSeedHelper
+
+ActivityService --> CrmDbContext
+ClientService --> CrmDbContext
+DealService --> CrmDbContext
+DealItemService --> CrmDbContext
+DealItemService --> IDealAmountCalculator
+DealAmountCalculator --> CrmDbContext
+ForecastService --> CrmDbContext
+ProductService --> CrmDbContext
+RecommendationService --> CrmDbContext
+TaskService --> CrmDbContext
+UserProvisioningService --> CrmDbContext
+UserProvisioningService --> IKeycloakAdminService
+UserQueryService --> CrmDbContext
+UserManagementService --> CrmDbContext
+UserManagementService --> IKeycloakAdminService
+AuthService --> IKeycloakAdminService
+RecommendationDataSeedHelper --> CrmDbContext
+MachineLearningOrchestrator --> CrmDbContext
+
+@enduml

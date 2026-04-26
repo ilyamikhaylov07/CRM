@@ -1,0 +1,319 @@
+@startuml
+hide methods
+hide stereotypes
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam linetype ortho
+skinparam nodesep 70
+skinparam ranksep 70
+skinparam ArrowColor #334155
+skinparam ArrowThickness 1.2
+skinparam entity {
+  BackgroundColor #F8F9FB
+  BorderColor #1F2937
+  FontColor #111827
+}
+
+title CRM ERD - Overview
+
+entity "roles" as roles {
+  * id : uuid
+  --
+  name : text
+  description : text?
+}
+
+entity "users" as users {
+  * id : uuid
+  --
+  role_id : uuid <<FK>>
+  first_name : text
+  last_name : text
+  email : text
+  status : varchar(50)
+}
+
+entity "clients" as clients {
+  * id : uuid
+  --
+  external_id : text
+  name : text
+  age : int
+  gender : text
+  location : text
+}
+
+entity "products" as products {
+  * id : uuid
+  --
+  name : varchar(200)
+  category : text
+  color : text?
+  size : text?
+  base_price : numeric(18,2)
+}
+
+entity "deals" as deals {
+  * id : uuid
+  --
+  client_id : uuid <<FK>>
+  user_id : uuid? <<FK>>
+  purchase_amount : numeric(18,2)
+  purchase_date_utc : timestamptz
+}
+
+entity "deal_items" as deal_items {
+  * id : uuid
+  --
+  deal_id : uuid <<FK>>
+  product_id : uuid <<FK>>
+  quantity : numeric(18,3)
+  total_price : numeric(18,2)
+}
+
+entity "activities" as activities {
+  * id : uuid
+  --
+  client_id : uuid <<FK>>
+  user_id : uuid? <<FK>>
+  deal_id : uuid? <<FK>>
+  type : text
+  activity_date_utc : timestamptz
+}
+
+entity "task_items" as task_items {
+  * id : uuid
+  --
+  assigned_to_user_id : uuid? <<FK>>
+  client_id : uuid <<FK>>
+  deal_id : uuid? <<FK>>
+  title : text
+  due_date_utc : timestamptz
+  status : text
+}
+
+entity "sales_forecasts" as sales_forecasts {
+  * id : uuid
+  --
+  client_id : uuid <<FK>>
+  forecast_date_utc : timestamptz
+  predicted_amount : numeric(18,2)
+  confidence_score : numeric(5,4)?
+}
+
+entity "recommendations" as recommendations {
+  * id : uuid
+  --
+  client_id : uuid <<FK>>
+  product_id : uuid <<FK>>
+  recommendation_date_utc : timestamptz
+  score : numeric(10,4)
+  status : text
+}
+
+roles ||--o{ users
+clients ||--o{ deals
+users |o--o{ deals
+deals ||--o{ deal_items
+products ||--o{ deal_items
+clients ||--o{ activities
+users |o--o{ activities
+deals |o--o{ activities
+clients ||--o{ task_items
+users |o--o{ task_items : assigned_to
+deals |o--o{ task_items
+clients ||--o{ sales_forecasts
+clients ||--o{ recommendations
+products ||--o{ recommendations
+
+legend right
+  ||= exactly one
+  |o= zero or one
+  }o= zero or many
+  }|= one or many
+endlegend
+
+note bottom of deal_items
+  Unique index: (deal_id, product_id)
+end note
+
+note bottom of users
+  Unique index: email
+end note
+
+note bottom of clients
+  Unique index: external_id
+end note
+
+newpage
+title CRM ERD - Sales Block
+left to right direction
+
+entity "clients" as sales_clients {
+  * id : uuid
+  --
+  external_id : text
+  name : text
+}
+
+entity "users" as sales_users {
+  * id : uuid
+  --
+  role_id : uuid <<FK>>
+  first_name : text
+  last_name : text
+}
+
+entity "deals" as sales_deals {
+  * id : uuid
+  --
+  client_id : uuid <<FK>>
+  user_id : uuid? <<FK>>
+  purchase_amount : numeric(18,2)
+  purchase_date_utc : timestamptz
+  payment_method : varchar(100)
+  shipping_type : varchar(100)?
+}
+
+entity "deal_items\n<<bridge>>" as sales_deal_items {
+  * id : uuid
+  --
+  deal_id : uuid <<FK>>
+  product_id : uuid <<FK>>
+  quantity : numeric(18,3)
+  unit_price : numeric(18,2)
+  total_price : numeric(18,2)
+}
+
+entity "products" as sales_products {
+  * id : uuid
+  --
+  name : varchar(200)
+  category : text
+  base_price : numeric(18,2)
+}
+
+sales_deals -[hidden]right- sales_deal_items
+sales_deal_items -[hidden]right- sales_products
+sales_clients -[hidden]up- sales_deals
+sales_users -[hidden]down- sales_deals
+
+sales_clients ||--o{ sales_deals
+sales_users |o--o{ sales_deals
+sales_deals ||--o{ sales_deal_items
+sales_products ||--o{ sales_deal_items
+
+note bottom of sales_deal_items
+  Associative entity (bridge table)
+  between deals and products.
+end note
+
+newpage
+title CRM ERD - Client Interaction Block
+left to right direction
+
+entity "clients" as interaction_clients {
+  * id : uuid
+  --
+  external_id : text
+  name : text
+}
+
+entity "users" as interaction_users {
+  * id : uuid
+  --
+  first_name : text
+  last_name : text
+}
+
+entity "deals" as interaction_deals {
+  * id : uuid
+  --
+  client_id : uuid <<FK>>
+  user_id : uuid? <<FK>>
+  purchase_date_utc : timestamptz
+}
+
+entity "activities" as interaction_activities {
+  * id : uuid
+  --
+  client_id : uuid <<FK>>
+  user_id : uuid? <<FK>>
+  deal_id : uuid? <<FK>>
+  type : text
+  subject : text?
+  activity_date_utc : timestamptz
+}
+
+entity "task_items" as interaction_tasks {
+  * id : uuid
+  --
+  assigned_to_user_id : uuid? <<FK>>
+  client_id : uuid <<FK>>
+  deal_id : uuid? <<FK>>
+  title : text
+  due_date_utc : timestamptz
+  status : text
+}
+
+interaction_clients ||--o{ interaction_activities
+interaction_users |o--o{ interaction_activities
+interaction_deals |o--o{ interaction_activities
+interaction_clients ||--o{ interaction_tasks
+interaction_users |o--o{ interaction_tasks : assigned_to
+interaction_deals |o--o{ interaction_tasks
+
+newpage
+title CRM ERD - Analytics Block
+left to right direction
+
+entity "clients" as analytics_clients {
+  * id : uuid
+  --
+  external_id : text
+  name : text
+}
+
+entity "products" as analytics_products {
+  * id : uuid
+  --
+  name : varchar(200)
+  category : text
+}
+
+entity "sales_forecasts" as analytics_forecasts {
+  * id : uuid
+  --
+  client_id : uuid <<FK>>
+  forecast_date_utc : timestamptz
+  period_start_utc : timestamptz
+  period_end_utc : timestamptz
+  predicted_amount : numeric(18,2)
+  confidence_score : numeric(5,4)?
+}
+
+entity "recommendations\n<<bridge>>" as analytics_recommendations {
+  * id : uuid
+  --
+  client_id : uuid <<FK>>
+  product_id : uuid <<FK>>
+  recommendation_date_utc : timestamptz
+  score : numeric(10,4)
+  reason : text?
+  status : text
+}
+
+analytics_clients -[hidden]left- analytics_recommendations
+analytics_recommendations -[hidden]right- analytics_products
+analytics_forecasts -[hidden]down- analytics_clients
+
+analytics_clients ||--o{ analytics_forecasts
+analytics_clients ||--o{ analytics_recommendations
+analytics_products ||--o{ analytics_recommendations
+
+note bottom of analytics_recommendations
+  Associative entity (bridge table)
+  between clients and products.
+end note
+
+@enduml

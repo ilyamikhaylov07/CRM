@@ -1,0 +1,98 @@
+@startuml
+title CRM - UML Deployment Diagram
+
+skinparam shadowing false
+skinparam linetype ortho
+skinparam nodesep 45
+skinparam ranksep 55
+skinparam padding 6
+skinparam pageMargin 10
+skinparam artifact {
+  Padding 8
+  Margin 8
+}
+skinparam node {
+  Padding 10
+  Margin 10
+}
+left to right direction
+scale max 2480*1748
+
+actor "CRM user" as User
+
+node "Client device" as ClientDevice <<device>> {
+  artifact "Browser or API client" as Browser <<artifact>>
+}
+
+node "Application host" as AppHost <<device>> {
+  node "Docker container / ASP.NET Core process" as CrmRuntime <<executionEnvironment>> {
+    artifact "Crm.dll" as CrmDll <<artifact>>
+    artifact "appsettings.json" as Settings <<artifact>>
+    artifact "ml-models directory" as Models <<artifact>>
+  }
+}
+
+node "PostgreSQL host" as PgHost <<device>> {
+  node "PostgreSQL runtime" as PgRuntime <<executionEnvironment>> {
+    database "crm_db" as CrmDb
+  }
+}
+
+node "Identity provider host" as IdpHost <<device>> {
+  node "Keycloak runtime" as KeycloakRuntime <<executionEnvironment>>
+}
+
+node "Observability host" as ObsHost <<device>> {
+  together {
+    node "OTLP Collector" as Collector <<executionEnvironment>>
+    node "Jaeger" as Jaeger <<executionEnvironment>>
+  }
+  together {
+    node "Prometheus" as Prometheus <<executionEnvironment>>
+    node "Grafana" as Grafana <<executionEnvironment>>
+  }
+  node "stdout / log collector" as Logs <<executionEnvironment>>
+}
+
+node "Import data location" as ImportHost <<device>> {
+  artifact "Shopping trends source file" as Csv <<artifact>>
+}
+
+User --> Browser : работает с CRM
+Browser --> CrmRuntime : HTTPS REST\n8080/8081
+
+CrmRuntime --> PgRuntime : TCP 5432\nEF Core / Npgsql
+PgRuntime --> CrmDb : хранит данные
+
+CrmRuntime --> KeycloakRuntime : HTTP 8080\nJWT/OIDC и Admin API
+CrmRuntime --> Collector : OTLP traces\n4317
+Collector --> Jaeger : передает трассировки
+Prometheus --> CrmRuntime : собирает /metrics
+Grafana --> Prometheus : читает метрики
+Grafana --> Jaeger : читает трассировки
+CrmRuntime --> Logs : пишет stdout-логи
+
+CrmDll --> Models : читает/пишет ML-модели
+CrmRuntime --> Csv : читает файл импорта
+
+Settings ..> PgRuntime : строка подключения
+Settings ..> KeycloakRuntime : URL и realm
+Settings ..> Collector : OTLP endpoint
+
+note right of AppHost
+  Dockerfile публикует Crm.dll в /app.
+  Контейнер открывает порты 8080 и 8081.
+end note
+
+note right of KeycloakRuntime
+  Realm: crm.
+  Clients: crm-api и admin-api.
+end note
+
+note bottom of ObsHost
+  Prometheus собирает метрики с CRM /metrics.
+  OTLP Collector принимает трассировки CRM и передает их в Jaeger.
+  Grafana используется для просмотра метрик и трассировок.
+end note
+
+@enduml

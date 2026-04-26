@@ -1,0 +1,125 @@
+@startuml
+hide empty members
+skinparam shadowing false
+skinparam roundcorner 12
+skinparam linetype ortho
+skinparam nodesep 60
+skinparam ranksep 75
+skinparam packageStyle rectangle
+skinparam ArrowColor #334155
+skinparam ArrowThickness 1.2
+
+title CRM Class Diagram - Infrastructure
+left to right direction
+
+package "Database" {
+  class CrmDbContext {
+    +Users : DbSet<User>
+    +Roles : DbSet<Role>
+    +Clients : DbSet<Client>
+    +Products : DbSet<Product>
+    +Deals : DbSet<Deal>
+    +DealItems : DbSet<DealItem>
+    +Activities : DbSet<Activity>
+    +TaskItems : DbSet<TaskItem>
+    +SalesForecasts : DbSet<SalesForecast>
+    +Recommendations : DbSet<Recommendation>
+    +SaveChanges()
+    +SaveChangesAsync()
+  }
+
+  class RoleSeeder {
+    +SeedAsync()
+  }
+
+  class ActivityConfiguration
+  class ClientConfiguration
+  class DealConfiguration
+  class DealItemConfiguration
+  class ProductConfiguration
+  class RecommendationConfiguration
+  class RoleConfiguration
+  class SalesForecastConfiguration
+  class TaskItemConfiguration
+  class UserConfiguration
+}
+
+package "Keycloak Adapter" {
+  interface IKeycloakAdminService {
+    +CreateUserAsync()
+    +AssignRoleAsync()
+    +RemoveRoleAsync()
+    +GetUserRolesAsync()
+    +FindUserIdByEmailAsync()
+    +SendVerifyEmailAsync()
+    +SendSetupPasswordAsync()
+    +SetEnabledAsync()
+  }
+
+  class KeycloakAdminService
+  class KeycloakAdminSettings
+  class KeycloakRoleRepresentation
+}
+
+package "Import" {
+  class ShoppingTrendsImportService
+  class ShoppingTrendRuRow
+  class ShoppingTrendsRuParser
+}
+
+package "Observability" {
+  class KeycloakHealthCheck
+  class ActivityEnricher
+}
+
+package "Domain Entities" {
+  class User
+  class Role
+  class Client
+  class Product
+  class Deal
+  class DealItem
+  class Activity
+  class TaskItem
+  class SalesForecast
+  class Recommendation
+}
+
+CrmDbContext -[hidden]right- RoleSeeder
+RoleSeeder -[hidden]right- IKeycloakAdminService
+IKeycloakAdminService -[hidden]right- ShoppingTrendsImportService
+ShoppingTrendsImportService -[hidden]right- KeycloakHealthCheck
+
+RoleSeeder --> CrmDbContext
+CrmDbContext --> User
+CrmDbContext --> Role
+CrmDbContext --> Client
+CrmDbContext --> Product
+CrmDbContext --> Deal
+CrmDbContext --> DealItem
+CrmDbContext --> Activity
+CrmDbContext --> TaskItem
+CrmDbContext --> SalesForecast
+CrmDbContext --> Recommendation
+
+ActivityConfiguration --> Activity
+ClientConfiguration --> Client
+DealConfiguration --> Deal
+DealItemConfiguration --> DealItem
+ProductConfiguration --> Product
+RecommendationConfiguration --> Recommendation
+RoleConfiguration --> Role
+SalesForecastConfiguration --> SalesForecast
+TaskItemConfiguration --> TaskItem
+UserConfiguration --> User
+
+KeycloakAdminService ..|> IKeycloakAdminService
+KeycloakAdminService --> KeycloakAdminSettings
+KeycloakAdminService --> KeycloakRoleRepresentation
+
+ShoppingTrendsImportService --> CrmDbContext
+ShoppingTrendsImportService --> ShoppingTrendRuRow
+ShoppingTrendsRuParser --> ShoppingTrendRuRow
+KeycloakHealthCheck --> IKeycloakAdminService
+
+@enduml
